@@ -26,6 +26,7 @@ func InetRoutes(app *fiber.App) {
 	pf.Post("/", c.AddProfile)
 	pf.Post("/edit", c.UpdateProfile)
 	pf.Post("/remove", c.RemoveProfile)
+	pf.Get("/info", c.GetProfileByKey)
 
 	//สร้างapi รับค่าตัวเลข ผ่านpath แล้วreturnเป็นค่าfactorialของตัวเลขนั้น
 	v1Protected.Get("/fact/:num", c.Factorial)

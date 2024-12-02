@@ -540,3 +540,15 @@ func GetGen(c *fiber.Ctx) error {
 	}
 	return c.Status(200).JSON(r)
 }
+
+func GetProfileByKey(c *fiber.Ctx) error {
+	db := database.DBConn
+	search := strings.TrimSpace(c.Query("search"))
+	var profiles []m.Profile
+
+	result := db.Where("employee_id = ? OR name = ? OR last_name = ?", search, search, search).Find(&profiles)
+	if result.RowsAffected == 0 {
+		return c.SendStatus(404)
+	}
+	return c.Status(200).JSON(&profiles)
+}

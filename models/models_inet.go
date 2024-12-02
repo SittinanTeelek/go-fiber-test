@@ -52,3 +52,11 @@ type Profile struct {
 	Email      string `json:"email"`
 	Tel        int    `json:"tel"`
 }
+
+// "employee_id":123,
+// "name":"dsad",
+// "lastname":"sada",
+// "birthday":123,
+// "age":12,
+// "email":"12321sada",
+// "tel":123123,
