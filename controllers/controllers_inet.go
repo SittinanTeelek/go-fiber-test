@@ -349,7 +349,7 @@ func GetDogsColor(c *fiber.Ctx) error {
 
 func GetProfiles(c *fiber.Ctx) error {
 	db := database.DBConn
-	var profiles []m.Profile
+	var profiles []m.Profiles
 
 	if err := db.Find(&profiles).Error; err != nil {
 		return c.SendStatus(500)
@@ -361,7 +361,7 @@ func GetProfiles(c *fiber.Ctx) error {
 func GetProfile(c *fiber.Ctx) error {
 	db := database.DBConn
 	search := strings.TrimSpace(c.Query("search"))
-	var profile []m.Profile
+	var profile []m.Profiles
 
 	if search == "" {
 		return c.SendStatus(400)
@@ -378,7 +378,7 @@ func GetProfile(c *fiber.Ctx) error {
 
 func AddProfile(c *fiber.Ctx) error {
 	db := database.DBConn
-	var profile m.Profile
+	var profile m.Profiles
 
 	if err := c.BodyParser(&profile); err != nil {
 		return c.Status(400).SendString(err.Error())
@@ -390,7 +390,7 @@ func AddProfile(c *fiber.Ctx) error {
 
 func UpdateProfile(c *fiber.Ctx) error {
 	db := database.DBConn
-	var profile m.Profile
+	var profile m.Profiles
 	id := c.Params("id")
 
 	if err := c.BodyParser(&profile); err != nil {
@@ -404,7 +404,7 @@ func UpdateProfile(c *fiber.Ctx) error {
 func RemoveProfile(c *fiber.Ctx) error {
 	db := database.DBConn
 	id := c.Params("id")
-	var profile m.Profile
+	var profile m.Profiles
 
 	result := db.Delete(&profile, id)
 
@@ -417,7 +417,7 @@ func RemoveProfile(c *fiber.Ctx) error {
 
 func GetGen(c *fiber.Ctx) error {
 	db := database.DBConn
-	var profiles []m.Profile
+	var profiles []m.Profiles
 
 	if err := db.Find(&profiles).Error; err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to fetch profile data"})
@@ -430,13 +430,25 @@ func GetGen(c *fiber.Ctx) error {
 		"Baby Boomer":     0,
 		"G.I. Generation": 0,
 	}
-	for _, profile := range profiles {
-		gen := getGenerationByAge(profile.Age)
+	var dataResults []m.Profiles
+	for _, profiles := range profiles {
+		var gen string
+		switch {
+		case profiles.Age < 24:
+			gen = "GenZ"
+		case profiles.Age <= 41:
+			gen = "GenY"
+		case profiles.Age <= 56:
+			gen = "GenX"
+		case profiles.Age <= 75:
+			gen = "Baby Boomer"
+		default:
+			gen = "G.I. Generation"
+		}
 		genDivider[gen]++
 	}
-
 	result := m.ResultProfileData{
-		Data:         profiles,
+		Data:         dataResults,
 		Count:        len(profiles),
 		GenZ:         genDivider["GenZ"],
 		GenY:         genDivider["GenY"],
@@ -447,25 +459,10 @@ func GetGen(c *fiber.Ctx) error {
 	return c.Status(200).JSON(result)
 }
 
-func getGenerationByAge(age int) string {
-	switch {
-	case age < 24:
-		return "GenZ"
-	case age <= 41:
-		return "GenY"
-	case age <= 56:
-		return "GenX"
-	case age <= 75:
-		return "Baby Boomer"
-	default:
-		return "G.I. Generation"
-	}
-}
-
 func GetProfileFilter(c *fiber.Ctx) error {
 	db := database.DBConn
 	search := strings.TrimSpace(c.Query("search"))
-	var profiles []m.Profile
+	var profiles []m.Profiles
 
 	result := db.Where("employee_id = ? OR name = ? OR last_name = ?", search, search, search).Find(&profiles)
 	if result.RowsAffected == 0 {
@@ -477,7 +474,7 @@ func GetProfileFilter(c *fiber.Ctx) error {
 func GetProfileByKey(c *fiber.Ctx) error {
 	db := database.DBConn
 	search := strings.TrimSpace(c.Query("search"))
-	var profiles []m.Profile
+	var profiles []m.Profiles
 
 	result := db.Where("employee_id = ? OR name = ? OR last_name = ?", search, search, search).Find(&profiles)
 	if result.RowsAffected == 0 {

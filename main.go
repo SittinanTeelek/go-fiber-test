@@ -28,7 +28,7 @@ func initDatabase() {
 	fmt.Println("Database connected!")
 	database.DBConn.AutoMigrate(&m.Dog{})
 	database.DBConn.AutoMigrate(&m.Companies{})
-	database.DBConn.AutoMigrate(&m.Profile{})
+	database.DBConn.AutoMigrate(&m.Profiles{})
 }
 
 func main() {

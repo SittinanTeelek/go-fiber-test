@@ -66,15 +66,15 @@ type Companies struct {
 // "name":"sdaas",
 // "businesstype":"asdas"
 
-type Profile struct {
+type Profiles struct {
 	gorm.Model
-	EmployeeID int    `json:"employee_id" validate:"required"`
-	Name       string `json:"name" validate:"required"`
-	LastName   string `json:"lastname" validate:"required"`
-	BirthDay   string `json:"birthday" validate:"required"`
-	Age        int    `json:"age" validate:"required"`
-	Email      string `json:"email" validate:"required,email"`
-	Tel        string `json:"tel" validate:"required"`
+	EmployeeID int    `json:"employee_id"`
+	Name       string `json:"name"`
+	LastName   string `json:"lastname"`
+	BirthDay   string `json:"birthday"`
+	Age        int    `json:"age"`
+	Email      string `json:"email"`
+	Tel        string `json:"tel"`
 }
 
 // "employee_id":"",
@@ -85,11 +85,11 @@ type Profile struct {
 // "email":"",
 // "tel":"",
 type ResultProfileData struct {
-	Data         []Profile `json:"data"`
-	Count        int       `json:"count"`
-	GenZ         int       `json:"genz"`
-	GenY         int       `json:"geny"`
-	GenX         int       `json:"genx"`
-	BabyBoomer   int       `json:"babyboomer"`
-	GIGeneration int       `json:"gi_generation"`
+	Data         []Profiles `json:"data"`
+	Count        int        `json:"count"`
+	GenZ         int        `json:"genz"`
+	GenY         int        `json:"geny"`
+	GenX         int        `json:"genx"`
+	BabyBoomer   int        `json:"babyboomer"`
+	GIGeneration int        `json:"gi_generation"`
 }
