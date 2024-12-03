@@ -68,11 +68,28 @@ type Companies struct {
 
 type Profile struct {
 	gorm.Model
-	EmployeeID int    `json:"employee_id"`
-	Name       string `json:"name"`
-	LastName   string `json:"lastname"`
-	BirthDay   int    `json:"birthday"`
-	Age        int    `json:"age"`
-	Email      string `json:"email"`
-	Tel        int    `json:"tel"`
+	EmployeeID int    `json:"employee_id" validate:"required"`
+	Name       string `json:"name" validate:"required"`
+	LastName   string `json:"lastname" validate:"required"`
+	BirthDay   string `json:"birthday" validate:"required"`
+	Age        int    `json:"age" validate:"required"`
+	Email      string `json:"email" validate:"required,email"`
+	Tel        string `json:"tel" validate:"required"`
+}
+
+// "employee_id":"",
+// "name":"",
+// "lastname":"",
+// "birthday":"",
+// "age":"",
+// "email":"",
+// "tel":"",
+type ResultProfileData struct {
+	Data         []Profile `json:"data"`
+	Count        int       `json:"count"`
+	GenZ         int       `json:"genz"`
+	GenY         int       `json:"geny"`
+	GenX         int       `json:"genx"`
+	BabyBoomer   int       `json:"babyboomer"`
+	GIGeneration int       `json:"gi_generation"`
 }

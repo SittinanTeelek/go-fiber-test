@@ -14,7 +14,7 @@ func InetRoutes(app *fiber.App) {
 		},
 	})
 
-	pfAuth := basicauth.New(basicauth.Config{
+	authPf := basicauth.New(basicauth.Config{
 		Users: map[string]string{
 			"testgo": "23012023",
 		},
@@ -49,7 +49,7 @@ func InetRoutes(app *fiber.App) {
 	dog := v1.Group("/dog")
 
 	dog.Get("", c.GetDogs)
-	dog.Get("/filter50_100", c.GetDog50_100)
+	dog.Get("/range", c.GetDog50_100)
 	dog.Get("/color", c.GetDogsColor)
 	dog.Get("/deleted", c.GetDogsDeleted)
 	dog.Get("/filter", c.GetDog)
@@ -59,15 +59,16 @@ func InetRoutes(app *fiber.App) {
 	dog.Delete("/:id", c.RemoveDog)
 
 	//สร้างตารางโปรไฟล์ผู้ใช้ผ่านการ automigrate
-	noAuthProfile := v1.Group("/profile")
+	npf := v1.Group("/profile")
 
-	noAuthProfile.Get("/", c.GetProfiles)
-	noAuthProfile.Get("/gen", c.GetGen)
-	noAuthProfile.Get("/filter", c.GetProfileFilter)
-	authProfile := v1.Group("/profile", pfAuth)
+	npf.Get("/", c.GetProfiles)
+	npf.Get("/gen", c.GetGen)
+	npf.Get("/filter", c.GetProfileFilter)
 
-	authProfile.Post("/", c.AddProfile)
-	authProfile.Put("/:id", c.UpdateProfile)
-	authProfile.Delete("/:id", c.RemoveProfile)
+	apf := v1.Group("/profile", authPf)
+
+	apf.Post("/", c.AddProfile)
+	apf.Put("/:id", c.UpdateProfile)
+	apf.Delete("/:id", c.RemoveProfile)
 
 }

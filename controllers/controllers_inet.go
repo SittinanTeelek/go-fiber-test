@@ -155,7 +155,7 @@ func GetDogs(c *fiber.Ctx) error {
 	if err := db.Find(&dogs).Error; err != nil {
 		return c.SendStatus(500)
 	}
-	return c.Status(200).JSON(dogs)
+	return c.JSON(dogs)
 }
 
 func GetDog(c *fiber.Ctx) error {
@@ -298,52 +298,6 @@ func GetDogsJson(c *fiber.Ctx) error {
 	return c.Status(200).JSON(r)
 }
 
-// func GetDogsJson(c *fiber.Ctx) error {
-// 	db := database.DBConn
-// 	var dogs []m.Dogs
-
-// 	db.Find(&dogs)
-// 	var dataResults []m.DogsRes
-// 	for _, v := range dogs {
-// 		typeStr := ""
-// 		if v.DogID == 111 {
-// 			typeStr = "red"
-// 		} else if v.DogID == 113 {
-// 			typeStr = "green"
-// 		} else if v.DogID == 999 {
-// 			typeStr = "pink"
-// 		} else {
-// 			typeStr = "no color"
-// 		}
-
-// 		d := m.DogsRes{
-// 			Name:  v.Name,
-// 			DogID: v.DogID,
-// 			Type:  typeStr,
-// 		}
-// 		dataResults = append(dataResults, d)
-// 	}
-
-// 	type ResultData struct {
-// 		Data  []m.DogsRes `json:"data"`
-// 		Name  string      `json:"name"`
-// 		Count int         `json:"count"`
-// 	}
-// 	r := ResultData{
-// 		Data:  dataResults,
-// 		Name:  "golang-test",
-// 		Count: len(dogs),
-// 	}
-// 	return c.Status(200).JSON(r)
-// }
-
-// สร้างข้อมูลในตารางdog มากกว่า10ตัว(api add dog)GetdogJsonสร้างapi
-// ถ้าdog_id อยู่ระหว่าง 10-50 ให้โชว์คำว่า “red”ถ้าdog_id
-// อยู่ระหว่าง 100-150 ให้โชว์คำว่า “green”ถ้าdog_id
-// อยู่ระหว่าง 200-250 ให้โชว์คำว่า “pink”
-// นอกเหนือจากนั้น “no color”
-// ผลรวมแต่ละตัว
-
 func GetDogsColor(c *fiber.Ctx) error {
 	db := database.DBConn
 	var dogs []m.Dog
@@ -392,12 +346,34 @@ func GetDogsColor(c *fiber.Ctx) error {
 }
 
 // สร้างตารางโปรไฟล์ผู้ใช้ผ่านการ automigrate
+
 func GetProfiles(c *fiber.Ctx) error {
 	db := database.DBConn
 	var profiles []m.Profile
 
-	db.Find(&profiles) //delelete = null
+	if err := db.Find(&profiles).Error; err != nil {
+		return c.SendStatus(500)
+	}
+
 	return c.Status(200).JSON(profiles)
+}
+
+func GetProfile(c *fiber.Ctx) error {
+	db := database.DBConn
+	search := strings.TrimSpace(c.Query("search"))
+	var profile []m.Profile
+
+	if search == "" {
+		return c.SendStatus(400)
+	}
+
+	result := db.Find(&profile, "employee_id = ?", search)
+
+	if result.RowsAffected == 0 {
+		return c.SendStatus(fiber.StatusNotFound)
+	}
+	return c.Status(200).JSON(&profile)
+
 }
 
 func AddProfile(c *fiber.Ctx) error {
@@ -405,7 +381,7 @@ func AddProfile(c *fiber.Ctx) error {
 	var profile m.Profile
 
 	if err := c.BodyParser(&profile); err != nil {
-		return c.Status(503).SendString(err.Error())
+		return c.Status(400).SendString(err.Error())
 	}
 
 	db.Create(&profile)
@@ -418,7 +394,7 @@ func UpdateProfile(c *fiber.Ctx) error {
 	id := c.Params("id")
 
 	if err := c.BodyParser(&profile); err != nil {
-		return c.Status(503).SendString(err.Error())
+		return c.Status(400).SendString(err.Error())
 	}
 
 	db.Where("id = ?", id).Updates(&profile)
