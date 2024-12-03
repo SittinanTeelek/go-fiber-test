@@ -76,21 +76,3 @@ type Profile struct {
 	Email      string `json:"email"`
 	Tel        int    `json:"tel"`
 }
-
-// "employee_id":"",
-// "name":"",
-// "lastname":"",
-// "birthday":"",
-// "age":"",
-// "email":"",
-// "tel":"",
-
-type ResultProfileData struct {
-	Data         []Profile `json:"data"`
-	Count        int       `json:"count"`
-	GenZ         int       `json:"genz"`
-	GenY         int       `json:"geny"`
-	GenX         int       `json:"genx"`
-	BabyBoomer   int       `json:"babyboomer"`
-	GIGeneration int       `json:"gi_generation"`
-}
