@@ -13,21 +13,31 @@ type User struct {
 	Email    string `json:"email,omitempty" validate:"required,email,min=3,max=32"`
 }
 
-type Dogs struct {
+type Dog struct {
 	gorm.Model
 	Name  string `json:"name"`
 	DogID int    `json:"dog_id"`
 }
 
 type NewUser struct {
-	Email        string `json:"email,omitempty" validate:"required,email,min=3,max=32"`
-	UserName     string `json:"username" validate:"required,min=6,max=20"`
-	Password     string `json:"password" validate:"required,min=3,max=32"`
-	LineID       string `json:"lineid,omitempty" validate:"required,min=3,max=32"`
-	PhoneNumber  string `json:"phonenumber" validate:"required,min=3,max=32"`
-	BusinessType string `json:"businesstype" validate:"required,min=3,max=32"`
-	WebSite      string `json:"website" validate:"required,min=2,max=30"`
+	Email        string `json:"email" validate:"required,email"`
+	UserName     string `json:"username" validate:"required"`
+	Password     string `json:"password" validate:"required"`
+	LineID       string `json:"lineid,omitempty" validate:"required"`
+	PhoneNumber  string `json:"phonenumber" validate:"required"`
+	BusinessType string `json:"businesstype" validate:"required"`
+	WebSite      string `json:"website" validate:"required"`
 }
+
+// {
+//     "email":"sads@addfas.com",
+// 	"username":"asdf-",
+// 	"password":"123313",
+// 	"lineid":"qwewqewq",
+// 	"phonenumber":"213123",
+// 	"businesstype":"341232",
+// 	"website":"21321 "
+// }
 
 type DogsRes struct {
 	Name  string `json:"name"`
@@ -35,12 +45,26 @@ type DogsRes struct {
 	Type  string `json:"type"`
 }
 
-type Companys struct {
+type ResultDogData struct {
+	Data       []DogsRes `json:"data"`
+	Name       string    `json:"name"`
+	Count      int       `json:"count"`
+	SumRed     int       `json:"sum_red"`
+	SumGreen   int       `json:"sum_green"`
+	SumPink    int       `json:"sum_pink"`
+	SumNoColor int       `json:"sum_nocolor"`
+}
+
+type Companies struct {
 	gorm.Model
 	CompanyID    int    `json:"company_id"`
 	Name         string `json:"name"`
 	BusinessType string `json:"businesstype"`
 }
+
+// "company_id":001,
+// "name":"sdaas",
+// "businesstype":"asdas"
 
 type Profile struct {
 	gorm.Model
@@ -51,4 +75,22 @@ type Profile struct {
 	Age        int    `json:"age"`
 	Email      string `json:"email"`
 	Tel        int    `json:"tel"`
+}
+
+// "employee_id":"",
+// "name":"",
+// "lastname":"",
+// "birthday":"",
+// "age":"",
+// "email":"",
+// "tel":"",
+
+type ResultProfileData struct {
+	Data         []Profile `json:"data"`
+	Count        int       `json:"count"`
+	GenZ         int       `json:"genz"`
+	GenY         int       `json:"geny"`
+	GenX         int       `json:"genx"`
+	BabyBoomer   int       `json:"babyboomer"`
+	GIGeneration int       `json:"gi_generation"`
 }
