@@ -105,7 +105,7 @@ func GetCompany(c *fiber.Ctx) error {
 	if result.RowsAffected == 0 {
 		return c.SendStatus(404)
 	}
-	return c.Status(200).JSON(&company)
+	return c.Status(200).JSON(company)
 }
 
 func AddCompany(c *fiber.Ctx) error {
@@ -135,8 +135,8 @@ func UpdateCompany(c *fiber.Ctx) error {
 
 func RemoveCompany(c *fiber.Ctx) error {
 	db := database.DBConn
-	id := c.Params("id")
 	var company m.Companies
+	id := c.Params("id")
 
 	result := db.Delete(&company, id)
 
@@ -168,7 +168,7 @@ func GetDog(c *fiber.Ctx) error {
 	if result.RowsAffected == 0 {
 		return c.SendStatus(404)
 	}
-	return c.Status(200).JSON(&dog)
+	return c.Status(200).JSON(dog)
 }
 
 // สร้าง api GET ใน group dogs โชว์ข้อมูลที่ถูกลบไปแล้ว ตารางdogs
@@ -186,19 +186,12 @@ func GetDog50_100(c *fiber.Ctx) error {
 	var dogs []m.Dog
 
 	result := db.Where("dog_id > ? AND dog_id < ?", 50, 100).Find(&dogs)
-	if result.Error != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"error": "Database query failed",
-		})
-	}
 
 	if result.RowsAffected == 0 {
-		return c.Status(404).JSON(fiber.Map{
-			"error": "No dogs found in the specified range",
-		})
+		return c.SendStatus(404)
 	}
 
-	return c.Status(200).JSON(&dogs)
+	return c.Status(200).JSON(dogs)
 }
 
 func AddDog(c *fiber.Ctx) error {
@@ -222,7 +215,11 @@ func UpdateDog(c *fiber.Ctx) error {
 		return c.Status(503).SendString(err.Error())
 	}
 
-	db.Where("id = ?", id).Updates(&dog)
+	result := db.Where("id = ?", id).Updates(&dog)
+	if result.RowsAffected == 0 {
+		return c.SendStatus(404)
+	}
+
 	return c.Status(200).JSON(dog)
 }
 
@@ -245,8 +242,10 @@ func DeletedDog(c *fiber.Ctx) error {
 
 	var deletedDog []m.Dog
 
-	if err := db.Unscoped().Where("deleted_at IS NOT NULL").Find(&deletedDog).Error; err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	result := db.Unscoped().Where("deleted_at IS NOT NULL").Find(&deletedDog)
+
+	if result.RowsAffected == 0 {
+		return c.SendStatus(404)
 	}
 	return c.Status(fiber.StatusOK).JSON(deletedDog)
 }
@@ -257,13 +256,7 @@ func GetDogsJson(c *fiber.Ctx) error {
 
 	db.Find(&dogs) //10ตัว
 
-	type DogsRes struct {
-		Name  string `json:"name"`
-		DogID int    `json:"dog_id"`
-		Type  string `json:"type"`
-	}
-
-	var dataResults []DogsRes
+	var dataResults []m.DogsRes
 	for _, v := range dogs { //1 inet 112 //2 inet1 113
 		typeStr := ""
 		if v.DogID == 111 {
@@ -276,7 +269,7 @@ func GetDogsJson(c *fiber.Ctx) error {
 			typeStr = "no color"
 		}
 
-		d := DogsRes{
+		d := m.DogsRes{
 			Name:  v.Name,  //inet
 			DogID: v.DogID, //112
 			Type:  typeStr, //no color
@@ -285,12 +278,7 @@ func GetDogsJson(c *fiber.Ctx) error {
 		// sumAmount += v.Amount
 	}
 
-	type ResultData struct {
-		Data  []DogsRes `json:"data"`
-		Name  string    `json:"name"`
-		Count int       `json:"count"`
-	}
-	r := ResultData{
+	r := m.ResultDogsData{
 		Data:  dataResults,
 		Name:  "golang-test",
 		Count: len(dogs), //หาผลรวม,
@@ -302,8 +290,10 @@ func GetDogsColor(c *fiber.Ctx) error {
 	db := database.DBConn
 	var dogs []m.Dog
 
-	if err := db.Find(&dogs).Error; err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": "Failed to fetch dogs data"})
+	result := db.Find(&dogs)
+
+	if result.RowsAffected == 0 {
+		return c.SendStatus(404)
 	}
 
 	colorCounts := map[string]int{
@@ -333,7 +323,7 @@ func GetDogsColor(c *fiber.Ctx) error {
 		}
 		dataResults = append(dataResults, d)
 	}
-	r := m.ResultDogData{
+	r := m.ResultColorData{
 		Data:       dataResults,
 		Name:       "golang-test",
 		Count:      len(dogs), //หาผลรวม,
@@ -351,8 +341,10 @@ func GetProfiles(c *fiber.Ctx) error {
 	db := database.DBConn
 	var profiles []m.Profiles
 
-	if err := db.Find(&profiles).Error; err != nil {
-		return c.SendStatus(500)
+	result := db.Find(&profiles)
+
+	if result.RowsAffected == 0 {
+		return c.SendStatus(fiber.StatusNotFound)
 	}
 
 	return c.Status(200).JSON(profiles)
@@ -372,7 +364,7 @@ func GetProfile(c *fiber.Ctx) error {
 	if result.RowsAffected == 0 {
 		return c.SendStatus(fiber.StatusNotFound)
 	}
-	return c.Status(200).JSON(&profile)
+	return c.Status(200).JSON(profile)
 
 }
 
@@ -468,7 +460,7 @@ func GetProfileFilter(c *fiber.Ctx) error {
 	if result.RowsAffected == 0 {
 		return c.SendStatus(404)
 	}
-	return c.Status(200).JSON(&profiles)
+	return c.Status(200).JSON(profiles)
 }
 
 func GetProfileByKey(c *fiber.Ctx) error {
@@ -480,5 +472,5 @@ func GetProfileByKey(c *fiber.Ctx) error {
 	if result.RowsAffected == 0 {
 		return c.SendStatus(404)
 	}
-	return c.Status(200).JSON(&profiles)
+	return c.Status(200).JSON(profiles)
 }

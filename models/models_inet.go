@@ -45,7 +45,13 @@ type DogsRes struct {
 	Type  string `json:"type"`
 }
 
-type ResultDogData struct {
+type ResultDogsData struct {
+	Data  []DogsRes `json:"data"`
+	Name  string    `json:"name"`
+	Count int       `json:"count"`
+}
+
+type ResultColorData struct {
 	Data       []DogsRes `json:"data"`
 	Name       string    `json:"name"`
 	Count      int       `json:"count"`
